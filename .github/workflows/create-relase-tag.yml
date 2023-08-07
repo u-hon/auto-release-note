@@ -31,14 +31,17 @@ jobs:
           today=$(date +'%Y.%m.%d')
           pre_release_date=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $1}')
           pre_release_count=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $2}')
-          if [[ -z $pre_release_date ]]; then
-            pre_release_date=${{ env.pre_tag }}
-            pre_release_count=0
-          elif [[ ! $pre_release_date = $today ]]; then
+
+          if [[ -z $pre_release_date || ! $pre_release_date = $today ]]; then
             echo "init count"
             pre_release_count=0
           fi
-          RELEASE_TAG=$today-$(($pre_release_count + 1))
+          
+          RELEASE_TAG=$today
+          if [[ $pre_release_count -gt 0 ]]; then
+            RELEASE_TAG=$today-$((pre_release_count + 1))
+          fi
+
           echo "release_tag=$RELEASE_TAG" >> $GITHUB_ENV
 
       # 前回リリースからの差分をもとに、リリースノートの本文を生成する
