@@ -17,7 +17,7 @@ jobs:
       # ラベル名を取得する
       # github.head_ref はブランチ名を取得する
       # cut -d "/" -f1 で "/" で区切った最初の要素を取得する
-      # echo "::set-output name=label_name::$label_name" で label_name という名前で出力する
+      # echo "label_name=$label_name" >> $GITHUB_STATE で label_name という名前で出力する
       - name: Get label name
         id: label_name
         run: |
@@ -29,7 +29,7 @@ jobs:
           else
             label_name=""
           fi
-          echo "::set-output name=label_name::$label_name"
+          echo "label_name=$label_name" >> $GITHUB_STATE
 
       # PRにラベルを付与する
       - name: Auto labeling
