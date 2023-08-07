@@ -1,0 +1,57 @@
+name: Create release tag and release note.
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  create-release-tag:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TZ: 'Asia/Tokyo'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # 前回のりリースタグを取得する
+      - name: Get previous tag
+        id: pre_tag
+        run: |
+          PRE_TAG=$(curl -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          echo "pre_tag=$PRE_TAG" >> $GITHUB_ENV
+
+      # タグを生成する 「{YYYY.MM.DD}-{当日リリース回数}」
+      # awk -F'-' '{print $1}' で "-" で区切った最初の要素を取得する
+      # if [[ -z $pre_release_date ]]; thenで'-'がなかった時の対応を行う（空文字対応）
+      - name: Generate release tag
+        id: release_tag
+        run: |
+          today=$(date +'%Y.%m.%d')
+          pre_release_date=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $1}')
+          pre_release_count=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $2}')
+          if [[ -z $pre_release_date ]]; then
+            pre_release_date=${{ env.pre_tag }}
+            pre_release_count=0
+          elif [[ ! $pre_release_date = $today ]]; then
+            echo "init count"
+            pre_release_count=0
+          fi
+          RELEASE_TAG=$today-$(($pre_release_count + 1))
+          echo "release_tag=$RELEASE_TAG" >> $GITHUB_ENV
+
+      # 前回リリースからの差分をもとに、リリースノートの本文を生成する
+      - name: Generate release note
+        id: release_note
+        run: |
+          RELEASE_NOTE=$(curl -X POST -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/${{ github.repository }}/releases/generate-notes -d '{"tag_name":"${{ env.release_tag }}", "previous_tag_name":"${{ env.pre_tag }}"}' | jq .body | sed 's/"//g')
+          echo "release_note=$RELEASE_NOTE" >> $GITHUB_ENV
+
+      # タグを切り、リリースノートを作成する
+      - name: Create Release
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{ \"tag_name\": \"${{ env.release_tag }}\", \"name\": \"${{ env.release_tag }}\", \"body\": \"${{ env.release_note }}\", \"draft\": true}" \
+            https://api.github.com/repos/${{ github.repository }}/releases
