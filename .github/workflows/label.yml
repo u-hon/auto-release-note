@@ -26,6 +26,12 @@ jobs:
             label_name=$(echo "enhancement")
           elif [ $branch_type == 'fix' ] || [ $branch_type == 'hotfix' ]; then
             label_name=$(echo "bug")
+          elif [ $branch_type == 'release' ]; then
+            label_name=$(echo "release")
+          elif [ $branch_type == 'improvement' ]; then
+            label_name=$(echo "improvement")
+          elif [ $branch_type == 'chore' ]; then
+            label_name=$(echo "chore")
           else
             label_name=""
           fi
