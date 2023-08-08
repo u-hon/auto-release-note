@@ -48,7 +48,8 @@ jobs:
 
           if [[ -n $pre_release_count && $pre_release_count =~ ^[0-9]+$  ]]; then
             echo "pre_release_countは空ではありません"
-            RELEASE_TAG=$RELEASE_TAG -$((pre_release_count + 1))
+            pre_release_count+=1
+            RELEASE_TAG+= " -${pre_release_count}"
           fi
 
           if [[ "${{ github.head_ref }}" =~ ^hotfix/.* ]]; then
