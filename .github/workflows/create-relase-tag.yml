@@ -51,7 +51,7 @@ jobs:
 
 
           if [[ "${{ github.head_ref }}" =~ ^hotfix/.* ]]; then
-            RELEASE_TAG = RELEASE_TAG + "-hotfix"
+            RELEASE_TAG = $RELEASE_TAG + "-hotfix"
           fi
 
           echo "release_tag=$RELEASE_TAG" >> $GITHUB_ENV
