@@ -32,6 +32,7 @@ jobs:
         run: |
           echo ${{github.ref_name}}
           echo ${{github.head_ref}}
+
           today=$(date +'%Y.%m.%d')
 
           pre_release_date=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $1}')
@@ -39,11 +40,11 @@ jobs:
 
 
           if [[ -z $pre_release_date || ! $pre_release_date = $today ]]; then
-            echo "init count"
             pre_release_count=0
           fi
 
           RELEASE_TAG=$today
+
           if [[ $pre_release_count -gt 0 ]]; then
             RELEASE_TAG=$today-$((pre_release_count + 1))
           fi
