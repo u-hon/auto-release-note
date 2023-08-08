@@ -46,7 +46,7 @@ jobs:
 
           RELEASE_TAG=$today
 
-          if [[ $pre_release_count -gt 0 ]]; then
+          if [[ -n $pre_release_count ]]; then
             RELEASE_TAG+=$((pre_release_count + 1))
           fi
 
