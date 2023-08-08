@@ -39,16 +39,14 @@ jobs:
           pre_release_count=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $2}')
           hotfix_text=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $3}')
 
-          if [[ -z $pre_release_date || ! $pre_release_date = $today ]]; then
-            echo "pre_release_date が空であるか、今日と等しくありません"
+          if [[ $pre_release_date = $today ]]; then
+            echo "pre_release_date 今日と等しい"
             pre_release_count=1
           fi
 
-          echo $pre_release_count
-
           RELEASE_TAG=$today
 
-          if [[ -n $pre_release_count || $pre_release_count =~ ^[0-9]+$  ]]; then
+          if [[ -n $pre_release_count && $pre_release_count =~ ^[0-9]+$  ]]; then
             echo "pre_release_countは空ではありません"
             RELEASE_TAG+=$((pre_release_count + 1))
           fi
