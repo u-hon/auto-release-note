@@ -34,12 +34,10 @@ jobs:
           echo ${{github.head_ref}}
 
           today=$(date +'%Y.%m.%d')
+
           pre_release_date=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $1}')
           pre_release_count=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $2}')
 
-          echo $pre_release_date
-          echo $pre_release_count
-          echo $today
 
           if [[ -z $pre_release_date || ! $pre_release_date = $today ]]; then
             pre_release_count=0
@@ -49,6 +47,11 @@ jobs:
 
           if [[ $pre_release_count -gt 0 ]]; then
             RELEASE_TAG=$today-$((pre_release_count + 1))
+          fi
+
+
+          if [[ "${{ github.head_ref }}" =~ ^hotfix/.* ]]; then
+            RELEASE_TAG = RELEASE_TAG + "-hotfix"
           fi
 
           echo "release_tag=$RELEASE_TAG" >> $GITHUB_ENV
