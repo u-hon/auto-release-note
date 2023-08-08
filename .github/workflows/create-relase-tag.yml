@@ -1,8 +1,10 @@
 name: Create release tag and release note.
 
 on:
-  push:
-    branches: [ main ]
+  pull_request:
+    branches:
+      - master
+    types: [closed]
 
 jobs:
   create-release-tag:
