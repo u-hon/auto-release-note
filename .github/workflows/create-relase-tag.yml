@@ -30,8 +30,8 @@ jobs:
       - name: Generate release tag
         id: release_tag
         run: |
-          echo ${{github.ref}}
           echo ${{github.ref_name}}
+          echo ${{github.head_ref}}
           today=$(date +'%Y.%m.%d')
           pre_release_date=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $1}')
           pre_release_count=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $2}')
