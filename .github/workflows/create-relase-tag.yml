@@ -30,20 +30,24 @@ jobs:
       - name: Generate release tag
         id: release_tag
         run: |
-          echo ${{github.ref_name}}
-          echo ${{github.head_ref}}
           today=$(date +'%Y.%m.%d')
+
           pre_release_date=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $1}')
           pre_release_count=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $2}')
+          hotfix_text=$(echo ${{ env.pre_tag }} | awk -F'-' '{print $3}')
 
-          if [[ -z $pre_release_date || ! $pre_release_date = $today ]]; then
-            echo "init count"
-            pre_release_count=0
+          if [[ $pre_release_date = $today ]]; then
+            pre_release_count=1
           fi
 
           RELEASE_TAG=$today
-          if [[ $pre_release_count -gt 0 ]]; then
+
+          if [[ -n $pre_release_count && $pre_release_count =~ ^[0-9]+$  ]]; then
             RELEASE_TAG=$today-$((pre_release_count + 1))
+          fi
+
+          if [[ "${{ github.head_ref }}" =~ ^hotfix/.* ]]; then
+            RELEASE_TAG+="-hotfix"
           fi
 
           echo "release_tag=$RELEASE_TAG" >> $GITHUB_ENV
