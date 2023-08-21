@@ -30,12 +30,13 @@ jobs:
       - name: Generate release tag
         id: release_tag
         run: |
-          first_char="${env.pre_tag:0:1}"
+          pre_tag=env.pre_tag
+          first_char="${pre_tag:0:1}"
 
           if [ "$first_char" = "v" ]; then
-            pre_tag="${env.pre_tag:1}"
+            pre_tag="${pre_tag:1}"
           else
-            pre_tag="$env.pre_tag"
+            pre_tag="$pre_tag"
           fi
 
           today=$(date +'%Y.%m.%d')
